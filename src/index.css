@@ -2,39 +2,63 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Tactical Game Design System - Dark military theme with green accents */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Dark tactical background */
+    --background: 120 10% 8%;
+    --foreground: 120 5% 85%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* Card backgrounds */
+    --card: 120 15% 12%;
+    --card-foreground: 120 5% 85%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 120 15% 12%;
+    --popover-foreground: 120 5% 85%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Military green primary */
+    --primary: 120 60% 35%;
+    --primary-foreground: 120 5% 95%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Dark secondary */
+    --secondary: 120 10% 18%;
+    --secondary-foreground: 120 5% 85%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted tactical colors */
+    --muted: 120 8% 15%;
+    --muted-foreground: 120 5% 60%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Bright green accent */
+    --accent: 120 80% 50%;
+    --accent-foreground: 120 10% 8%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Red for danger/target */
+    --destructive: 0 75% 50%;
+    --destructive-foreground: 0 0% 95%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Tactical borders */
+    --border: 120 15% 20%;
+    --input: 120 15% 20%;
+    --ring: 120 60% 35%;
+
+    /* Game specific colors */
+    --scope-primary: 120 80% 60%;
+    --scope-secondary: 120 60% 40%;
+    --hud-bg: 120 15% 10%;
+    --target-highlight: 0 75% 55%;
+    --success-color: 120 70% 50%;
+
+    /* Gradients */
+    --gradient-tactical: linear-gradient(135deg, hsl(var(--background)), hsl(120 12% 12%));
+    --gradient-scope: radial-gradient(circle, transparent 45%, hsl(120 10% 8% / 0.95) 55%);
+    
+    /* Shadows */
+    --shadow-tactical: 0 8px 25px -5px hsl(120 10% 5% / 0.5);
+    --shadow-hud: 0 4px 15px -3px hsl(120 60% 35% / 0.3);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --radius: 0.5rem;
 
@@ -100,6 +124,165 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground overflow-hidden;
+    cursor: none; /* Hide cursor for scope effect */
+  }
+}
+
+@layer components {
+  /* Scope Crosshair */
+  .scope-crosshair {
+    position: fixed;
+    pointer-events: none;
+    z-index: 1000;
+    width: 200px;
+    height: 200px;
+    border: 2px solid hsl(var(--scope-primary));
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 
+      0 0 0 2px hsl(var(--background)),
+      0 0 0 4px hsl(var(--scope-primary)),
+      inset 0 0 50px hsl(var(--scope-primary) / 0.1);
+  }
+
+  .scope-crosshair::before,
+  .scope-crosshair::after {
+    content: '';
+    position: absolute;
+    background: hsl(var(--scope-primary));
+    z-index: 1001;
+  }
+
+  .scope-crosshair::before {
+    top: 50%;
+    left: 20px;
+    right: 20px;
+    height: 1px;
+    transform: translateY(-50%);
+  }
+
+  .scope-crosshair::after {
+    left: 50%;
+    top: 20px;
+    bottom: 20px;
+    width: 1px;
+    transform: translateX(-50%);
+  }
+
+  /* Scope Center Dot */
+  .scope-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    background: hsl(var(--scope-primary));
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1002;
+  }
+
+  /* Scope Vignette Overlay */
+  .scope-vignette {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--gradient-scope);
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* HUD Elements */
+  .hud-panel {
+    background: hsl(var(--hud-bg) / 0.9);
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-hud);
+    backdrop-filter: blur(8px);
+  }
+
+  /* Character Animations */
+  .character-found {
+    animation: character-highlight 0.5s ease-out;
+  }
+
+  .character-bounce {
+    animation: character-bounce 2s ease-in-out infinite;
+  }
+
+  /* Game Button Variants */
+  .btn-tactical {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border: 2px solid hsl(var(--accent));
+    transition: var(--transition-smooth);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-tactical:hover {
+    background: hsl(var(--accent));
+    color: hsl(var(--accent-foreground));
+    box-shadow: var(--shadow-tactical);
+    transform: translateY(-2px);
+  }
+
+  .btn-danger {
+    background: hsl(var(--destructive));
+    color: hsl(var(--destructive-foreground));
+    border: 2px solid hsl(var(--destructive));
+  }
+
+  .btn-danger:hover {
+    background: hsl(var(--destructive) / 0.9);
+    box-shadow: 0 0 20px hsl(var(--destructive) / 0.5);
+  }
+}
+
+@layer utilities {
+  /* Game-specific animations */
+  @keyframes character-highlight {
+    0% { transform: scale(1); }
+    50% { 
+      transform: scale(1.2); 
+      filter: drop-shadow(0 0 20px hsl(var(--success-color)));
+    }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes character-bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+  }
+
+  @keyframes scope-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  @keyframes hud-glow {
+    0%, 100% { text-shadow: 0 0 5px hsl(var(--accent) / 0.5); }
+    50% { text-shadow: 0 0 15px hsl(var(--accent) / 0.8); }
+  }
+
+  /* Utility classes */
+  .animate-scope-pulse {
+    animation: scope-pulse 2s ease-in-out infinite;
+  }
+
+  .animate-hud-glow {
+    animation: hud-glow 2s ease-in-out infinite;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 10px hsl(var(--accent) / 0.6);
+  }
+
+  .cursor-crosshair {
+    cursor: crosshair;
   }
 }
